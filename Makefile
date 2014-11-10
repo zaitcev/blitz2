@@ -27,7 +27,9 @@ src/us/zaitcev/package1/R.java:  AndroidManifest.xml res/drawable/blitz2_1.png r
 # This is exactly why javists use Ant.
 # XXX replace *.java with the list - what about the full path?
 # -verbose
+# XXX Create some kind of .PHONY: prep stage that runs mkdir
 obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAndroid.class: src/us/zaitcev/package1/R.java src/us/zaitcev/package1/HelloAndroid.java
+	mkdir -p bin docs lib obj
 	${JAVAC} -d ${DEV_HOME}/obj -classpath ${ANDROID_HOME}/platforms/android-7/android.jar:${DEV_HOME}/obj -sourcepath ${DEV_HOME}/src ${DEV_HOME}/src/us/zaitcev/package1/*.java
  
 # --verbose

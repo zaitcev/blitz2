@@ -2,5 +2,5 @@
 <resources>
     <string name="blitz2_first">Android Test for blitz2</string>
     <string name="blitz2main">Main Activity for blitz2</string>
-    <string name="helloText">Hello, world!</string>
+    <string name="helloText">Hello, World!</string>
 </resources>
