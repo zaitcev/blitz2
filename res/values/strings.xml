@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="blitz2_first">Android Test for blitz2</string>
-    <string name="blitz2main">Main Activity for blitz2</string>
+    <string name="blitz2_label">blitz2</string>
+    <string name="blitz2_hello">Blitz</string>
     <string name="helloText">Hello, World!</string>
 </resources>

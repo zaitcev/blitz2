@@ -8,11 +8,13 @@
     <!-- <uses-sdk android:minSdkVersion="2" /> -->
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="17" />
 
-    <application android:label="@string/blitz2_first"
+    <!-- This label ends in Settings .. Apps (entry means whole app) -->
+    <application android:label="@string/blitz2_label"
                  android:icon="@drawable/blitz2_1">
 
+        <!-- This label ends under Blitz2 icon (launcher means activity) -->
         <activity android:name="us.zaitcev.package1.HelloAndroid"
-                  android:label="@string/blitz2main">
+                  android:label="@string/blitz2_hello">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
