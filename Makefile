@@ -37,8 +37,14 @@ bin/classes.dex: obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAn
 	${DX} --dex --output=bin/classes.dex ${DEV_HOME}/obj ${DEV_HOME}/lib
 
 # -v
+# Alternatively we could do something like this:
+#	${AAPT} package -f -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_HOME}/platforms/android-7/android.jar -F $@ ${DEV_HOME}/bin
+# But the above only takes a directory as argument, so it sweeps
+# the old APKs too.
+# A downside of the below is the extra output.
 bin/blitz2_1.unsigned.apk:  AndroidManifest.xml res/drawable/blitz2_1.png res/values/strings.xml bin/classes.dex
-	${AAPT} package -f -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_HOME}/platforms/android-7/android.jar -F bin/blitz2_1.unsigned.apk ${DEV_HOME}/bin
+	${AAPT} package -f -F $@ -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_HOME}/platforms/android-7/android.jar
+	${AAPT} add -k $@ bin/classes.dex
 
 # -verbose
 bin/blitz2_1.signed.apk: bin/blitz2_1.unsigned.apk
