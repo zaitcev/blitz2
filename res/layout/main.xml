@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- "match_parent" added in API Level 8 to deprecate "fill_parent" -->
+<!--  android:layout_height="20pt" -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/root"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+    <!--  android:focusable="false" - for EditText -->
+    <!--  android:text="@string/text_hello" -->
+    <TextView
+        android:id="@+id/text_status"
+        android:layout_weight="1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="@string/text_a" />
+
+    <Button
+        android:id="@+id/button_go"
+        android:text="@string/button_go"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1">
+    </Button>
+
+</LinearLayout>

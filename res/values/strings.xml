@@ -2,5 +2,7 @@
 <resources>
     <string name="blitz2_label">blitz2</string>
     <string name="blitz2_hello">Blitz</string>
-    <string name="helloText">Hello, World!</string>
+    <string name="text_a">*</string>
+    <string name="text_hello">Hello, World!</string>
+    <string name="button_go">Go</string>
 </resources>

@@ -1,21 +1,29 @@
 package us.zaitcev.package1;
 
+/* For subpackages */
+// import us.zaitcev.package1.R;
+
 import android.app.Activity;
-import android.content.res.Resources;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class HelloAndroid extends Activity {
+  private LinearLayout root;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    setContentView(R.layout.main); /* BTW, inflation and repaint happen later */
 
-    TextView textView = new TextView(this);
+    // Only works after onFinishInflate()
+    // root = (LinearLayout) findViewById(R.id.root);
+    // setContentView(root);
 
-    String text = getResources().getString(R.string.helloText);
-    textView.setText(text);
+    // TextView info = new TextView(this);
+    TextView info = (TextView) findViewById(R.id.text_status);
 
-    setContentView(textView);
+    String infoText = getResources().getString(R.string.text_hello);
+    info.setText(infoText);
   }
 }

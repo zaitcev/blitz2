@@ -21,8 +21,8 @@ all: bin/blitz2_1.apk
 # keytool -genkeypair -validity 10000 -dname "CN=blitz2_1.zaitcev.us, OU=Brain, O=Pete Zaitcev, L=Los Lunas, S=New Mexico, C=US" -keystore blitz2_1.keystore -storepass miageta -keypass shitaten -alias Blitz21Key -keyalg RSA -v
 
 # -v
-src/us/zaitcev/package1/R.java:  AndroidManifest.xml res/drawable/blitz2_1.png res/values/strings.xml
-	${AAPT} package -f -m -S ${DEV_HOME}/res -J ${DEV_HOME}/src -M AndroidManifest.xml -I ${ANDROID_HOME}/platforms/android-7/android.jar
+src/us/zaitcev/package1/R.java:  AndroidManifest.xml res/drawable/blitz2_1.png res/layout/main.xml res/values/strings.xml
+	${AAPT} package -f -m -J ${DEV_HOME}/src -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_HOME}/platforms/android-7/android.jar
 
 # There's actually a ton of classes that javac produces, but oh well.
 # This is exactly why javists use Ant.
@@ -31,7 +31,7 @@ src/us/zaitcev/package1/R.java:  AndroidManifest.xml res/drawable/blitz2_1.png r
 # XXX Create some kind of .PHONY: prep stage that runs mkdir
 obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAndroid.class: src/us/zaitcev/package1/R.java src/us/zaitcev/package1/HelloAndroid.java
 	mkdir -p bin docs lib obj
-	${JAVAC} -d ${DEV_HOME}/obj -classpath ${ANDROID_HOME}/platforms/android-7/android.jar:${DEV_HOME}/obj -sourcepath ${DEV_HOME}/src ${DEV_HOME}/src/us/zaitcev/package1/*.java
+	${JAVAC} -Xlint:all -d ${DEV_HOME}/obj -classpath ${ANDROID_HOME}/platforms/android-7/android.jar:${DEV_HOME}/obj -sourcepath ${DEV_HOME}/src ${DEV_HOME}/src/us/zaitcev/package1/*.java
  
 # --verbose
 bin/classes.dex: obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAndroid.class
@@ -43,7 +43,7 @@ bin/classes.dex: obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAn
 # But the above only takes a directory as argument, so it sweeps
 # the old APKs too.
 # A downside of the below is the extra output.
-bin/blitz2_1.unsigned.apk:  AndroidManifest.xml res/drawable/blitz2_1.png res/values/strings.xml bin/classes.dex
+bin/blitz2_1.unsigned.apk:  AndroidManifest.xml res/drawable/blitz2_1.png res/layout/main.xml res/values/strings.xml bin/classes.dex
 	${AAPT} package -f -F $@ -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_HOME}/platforms/android-7/android.jar
 	${AAPT} add -k $@ bin/classes.dex
 
