@@ -3,9 +3,10 @@
 ##
 
 ANDROID_HOME := ${HOME}/lib/android-sdk-linux
-AAPT := ${ANDROID_HOME}/build-tools/20.0.0/aapt
-DX := ${ANDROID_HOME}/build-tools/20.0.0/dx
+AAPT :=     ${ANDROID_HOME}/build-tools/20.0.0/aapt
+DX :=       ${ANDROID_HOME}/build-tools/20.0.0/dx
 ZIPALIGN := ${ANDROID_HOME}/build-tools/20.0.0/zipalign
+LINT :=     ${ANDROID_HOME}/tools/lint
 JAVAC = javac
 JARSIGNER = jarsigner
 
@@ -53,6 +54,10 @@ bin/blitz2_1.signed.apk: bin/blitz2_1.unsigned.apk
 # -v
 bin/blitz2_1.apk:  bin/blitz2_1.signed.apk
 	${ZIPALIGN} -f 4 bin/blitz2_1.signed.apk bin/blitz2_1.apk
+
+# Lint scans build results too, so make it depend on the build.
+lint:  all
+	${LINT} --sources src --resources res --classpath obj .
 
 clean:
 	rm -f src/us/zaitcev/package1/R.java
