@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="us.zaitcev.package1">
+    package="us.zaitcev.package1"
+    android:versionCode="1"
+    android:versionName="0.1">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- <uses-sdk android:minSdkVersion="2" /> -->
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="17" />
+    <!-- O'Reilly examples have 7, so no sense to go lower. -->
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="20" />
 
     <!-- This label ends in Settings .. Apps (entry means whole app) -->
     <application android:label="@string/blitz2_label"
-                 android:icon="@drawable/blitz2_1">
+                 android:icon="@drawable/blitz2_1"
+                 android:allowBackup="false">
 
         <!-- This label ends under Blitz2 icon (launcher means activity) -->
         <activity android:name="us.zaitcev.package1.HelloAndroid"
