@@ -53,7 +53,7 @@ bin/blitz2_1.unsigned.apk:  AndroidManifest.xml $(resources) bin/classes.dex
 	${AAPT} add -k $@ bin/classes.dex
 
 # -verbose
-bin/blitz2_1.signed.apk: bin/blitz2_1.unsigned.apk
+bin/blitz2_1.signed.apk: bin/blitz2_1.unsigned.apk blitz2_1.keystore
 	${JARSIGNER} -keystore blitz2_1.keystore -storepass miageta -keypass shitaten -signedjar bin/blitz2_1.signed.apk bin/blitz2_1.unsigned.apk Blitz21Key
 
 # -v
