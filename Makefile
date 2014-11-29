@@ -15,6 +15,8 @@ ANDROID_JAR := ${ANDROID_HOME}/platforms/android-${minSdkVersion}/android.jar
 
 DEV_HOME := $(shell pwd)
 
+resources = res/drawable/blitz2_1.png res/layout/main.xml res/menu/actions.xml res/values/strings.xml
+
 all: bin/blitz2_1.apk
 
 #
@@ -24,7 +26,7 @@ all: bin/blitz2_1.apk
 # keytool -genkeypair -validity 10000 -dname "CN=blitz2_1.zaitcev.us, OU=Brain, O=Pete Zaitcev, L=Los Lunas, S=New Mexico, C=US" -keystore blitz2_1.keystore -storepass miageta -keypass shitaten -alias Blitz21Key -keyalg RSA -v
 
 # -v
-src/us/zaitcev/package1/R.java:  AndroidManifest.xml res/drawable/blitz2_1.png res/layout/main.xml res/values/strings.xml
+src/us/zaitcev/package1/R.java:  AndroidManifest.xml $(resources)
 	${AAPT} package -f -m -J ${DEV_HOME}/src -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_JAR}
 
 # There's actually a ton of classes that javac produces, but oh well.
@@ -46,7 +48,7 @@ bin/classes.dex: obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAn
 # But the above only takes a directory as argument, so it sweeps
 # the old APKs too.
 # A downside of the below is the extra output.
-bin/blitz2_1.unsigned.apk:  AndroidManifest.xml res/drawable/blitz2_1.png res/layout/main.xml res/values/strings.xml bin/classes.dex
+bin/blitz2_1.unsigned.apk:  AndroidManifest.xml $(resources) bin/classes.dex
 	${AAPT} package -f -F $@ -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_JAR}
 	${AAPT} add -k $@ bin/classes.dex
 

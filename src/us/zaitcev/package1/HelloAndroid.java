@@ -6,6 +6,8 @@ package us.zaitcev.package1;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,5 +34,12 @@ public class HelloAndroid extends Activity {
     } else {
        info.setText("null abar");
     }
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.actions, menu);
+    return super.onCreateOptionsMenu(menu);
   }
 }
