@@ -3,6 +3,7 @@ package us.zaitcev.package1;
 /* For subpackages */
 // import us.zaitcev.package1.R;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.LinearLayout;
@@ -23,7 +24,13 @@ public class HelloAndroid extends Activity {
     // TextView info = new TextView(this);
     TextView info = (TextView) findViewById(R.id.text_status);
 
-    String infoText = getResources().getString(R.string.text_hello);
-    info.setText(infoText);
+    // XXX Use ActionBar for something productive or get rid of it.
+    ActionBar abar = getActionBar();
+    if (abar != null) {
+      String infoText = getResources().getString(R.string.text_hello);
+      info.setText(infoText);
+    } else {
+       info.setText("null abar");
+    }
   }
 }

@@ -9,7 +9,8 @@
 
     <!-- <uses-sdk android:minSdkVersion="2" /> -->
     <!-- O'Reilly examples have 7, so no sense to go lower. -->
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="20" />
+    <!-- We need API level 11 in order to use android.app.ActionBar -->
+    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="20" />
 
     <!-- This label ends in Settings .. Apps (entry means whole app) -->
     <application android:label="@string/blitz2_label"

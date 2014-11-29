@@ -10,6 +10,9 @@ LINT :=     ${ANDROID_HOME}/tools/lint
 JAVAC = javac
 JARSIGNER = jarsigner
 
+minSdkVersion := 11
+ANDROID_JAR := ${ANDROID_HOME}/platforms/android-${minSdkVersion}/android.jar
+
 DEV_HOME := $(shell pwd)
 
 all: bin/blitz2_1.apk
@@ -22,7 +25,7 @@ all: bin/blitz2_1.apk
 
 # -v
 src/us/zaitcev/package1/R.java:  AndroidManifest.xml res/drawable/blitz2_1.png res/layout/main.xml res/values/strings.xml
-	${AAPT} package -f -m -J ${DEV_HOME}/src -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_HOME}/platforms/android-7/android.jar
+	${AAPT} package -f -m -J ${DEV_HOME}/src -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_JAR}
 
 # There's actually a ton of classes that javac produces, but oh well.
 # This is exactly why javists use Ant.
@@ -31,7 +34,7 @@ src/us/zaitcev/package1/R.java:  AndroidManifest.xml res/drawable/blitz2_1.png r
 # XXX Create some kind of .PHONY: prep stage that runs mkdir
 obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAndroid.class: src/us/zaitcev/package1/R.java src/us/zaitcev/package1/HelloAndroid.java
 	mkdir -p bin docs lib obj
-	${JAVAC} -Xlint:all -d ${DEV_HOME}/obj -classpath ${ANDROID_HOME}/platforms/android-7/android.jar:${DEV_HOME}/obj -sourcepath ${DEV_HOME}/src ${DEV_HOME}/src/us/zaitcev/package1/*.java
+	${JAVAC} -Xlint:all -d ${DEV_HOME}/obj -classpath ${ANDROID_JAR}:${DEV_HOME}/obj -sourcepath ${DEV_HOME}/src ${DEV_HOME}/src/us/zaitcev/package1/*.java
  
 # --verbose
 bin/classes.dex: obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAndroid.class
@@ -44,7 +47,7 @@ bin/classes.dex: obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAn
 # the old APKs too.
 # A downside of the below is the extra output.
 bin/blitz2_1.unsigned.apk:  AndroidManifest.xml res/drawable/blitz2_1.png res/layout/main.xml res/values/strings.xml bin/classes.dex
-	${AAPT} package -f -F $@ -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_HOME}/platforms/android-7/android.jar
+	${AAPT} package -f -F $@ -M AndroidManifest.xml -S ${DEV_HOME}/res -I ${ANDROID_JAR}
 	${AAPT} add -k $@ bin/classes.dex
 
 # -verbose
