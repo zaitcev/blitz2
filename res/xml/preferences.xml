@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- See http://developer.android.com/guide/topics/ui/settings.html -->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- android:dependency="pref_sync" -->
+    <!--
+      entries:     The human-readable array to present as a list. Each entry
+                   must have a corresponding index in entryValues.
+      entryValues: The array to find the value to save for a preference when
+                   an entry from entries is selected. If a user clicks on the
+                   second item in entries, the second item in this array will
+                   be saved to the preference. 
+     -->
+    <!-- XXX drop separate shareTypeDialog -->
+    <ListPreference
+        android:key="pref_shareType"
+        android:title="@string/pref_shareType"
+        android:dialogTitle="@string/pref_shareTypeDialog"
+        android:entries="@array/pref_shareType_entries"
+        android:entryValues="@array/pref_shareType_values"
+        android:defaultValue="@string/pref_shareTypeDefault"
+     />
+
+    <EditTextPreference
+        android:key="pref_shareLocation"
+        android:title="@string/pref_shareLocation"
+        android:defaultValue="@string/pref_shareLocationDefault"
+     />
+</PreferenceScreen>

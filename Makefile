@@ -15,7 +15,7 @@ ANDROID_JAR := ${ANDROID_HOME}/platforms/android-${minSdkVersion}/android.jar
 
 DEV_HOME := $(shell pwd)
 
-resources = res/drawable/blitz2_1.png res/layout/main.xml res/menu/actions.xml res/values/strings.xml
+resources = res/drawable/blitz2_1.png res/layout/main.xml res/menu/actions.xml res/values/arrays.xml res/values/strings.xml res/xml/preferences.xml
 
 all: bin/blitz2_1.apk
 
@@ -34,12 +34,12 @@ src/us/zaitcev/package1/R.java:  AndroidManifest.xml $(resources)
 # XXX replace *.java with the list - what about the full path?
 # -verbose
 # XXX Create some kind of .PHONY: prep stage that runs mkdir
-obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAndroid.class: src/us/zaitcev/package1/R.java src/us/zaitcev/package1/HelloAndroid.java
+obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAndroid.class obj/us/zaitcev/package1/SettingsFragment.class: src/us/zaitcev/package1/R.java src/us/zaitcev/package1/HelloAndroid.java src/us/zaitcev/package1/SettingsFragment.java
 	mkdir -p bin docs lib obj
 	${JAVAC} -Xlint:all -d ${DEV_HOME}/obj -classpath ${ANDROID_JAR}:${DEV_HOME}/obj -sourcepath ${DEV_HOME}/src ${DEV_HOME}/src/us/zaitcev/package1/*.java
  
 # --verbose
-bin/classes.dex: obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAndroid.class
+bin/classes.dex: obj/us/zaitcev/package1/R.class obj/us/zaitcev/package1/HelloAndroid.class obj/us/zaitcev/package1/SettingsFragment.class
 	${DX} --dex --output=bin/classes.dex ${DEV_HOME}/obj ${DEV_HOME}/lib
 
 # -v

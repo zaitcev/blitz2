@@ -4,6 +4,11 @@
     <string name="blitz2_label">blitz2</string>
     <string name="blitz2_hello">Blitz</string>
     <string name="button_go">Go</string>
+    <string name="pref_shareLocation">Share Location</string>
+    <string name="pref_shareLocationDefault">https://</string>
+    <string name="pref_shareType">Share Type</string>
+    <string name="pref_shareTypeDialog">Select the Share Type</string>
+    <string name="pref_shareTypeDefault">basic</string>
     <string name="text_a">*</string>
     <string name="text_hello">Hello, World!</string>
 </resources>

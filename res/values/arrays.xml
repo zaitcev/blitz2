@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="pref_shareType_entries">
+        <item>HTTP with Basic Authentication</item>
+        <item>Amazon S3</item>
+    </array>
+    <array name="pref_shareType_values">
+        <item>basic</item>
+        <item>s3</item>
+    </array>
+</resources>
