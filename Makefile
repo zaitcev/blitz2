@@ -3,9 +3,10 @@
 ##
 
 ANDROID_HOME := ${HOME}/lib/android-sdk-linux
-AAPT :=     ${ANDROID_HOME}/build-tools/20.0.0/aapt
-DX :=       ${ANDROID_HOME}/build-tools/20.0.0/dx
-ZIPALIGN := ${ANDROID_HOME}/build-tools/20.0.0/zipalign
+ANDROID_BUILD_TOOLS := ${ANDROID_HOME}/build-tools/21.1.2
+AAPT :=     ${ANDROID_BUILD_TOOLS}/aapt
+DX :=       ${ANDROID_BUILD_TOOLS}/dx
+ZIPALIGN := ${ANDROID_BUILD_TOOLS}/zipalign
 LINT :=     ${ANDROID_HOME}/tools/lint
 JAVAC = javac
 JARSIGNER = jarsigner
