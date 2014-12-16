@@ -21,11 +21,13 @@
         android:entries="@array/pref_shareType_entries"
         android:entryValues="@array/pref_shareType_values"
         android:defaultValue="@string/pref_shareTypeDefault"
+        android:order="0"
      />
 
     <EditTextPreference
         android:key="pref_shareLocation"
         android:title="@string/pref_shareLocation"
         android:defaultValue="@string/pref_shareLocationDefault"
+        android:order="10"
      />
 </PreferenceScreen>

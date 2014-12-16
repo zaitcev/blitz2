@@ -10,20 +10,24 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MenuInflater;
-import android.widget.LinearLayout;
+import android.view.MenuItem;
+// import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class HelloAndroid extends Activity {
+
   // private LinearLayout root;
-  private TextView info;
   private ActionBar abar;
+  private TextView info;
+  boolean options_menu_inhibit;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main); /* BTW, inflation and repaint happen later */
+
+    abar = getActionBar();
 
     // Only works after onFinishInflate()
     // root = (LinearLayout) findViewById(R.id.root);
@@ -32,14 +36,8 @@ public class HelloAndroid extends Activity {
     // TextView info = new TextView(this);
     info = (TextView) findViewById(R.id.text_status);
 
-    abar = getActionBar();
-    if (abar != null) {
-      String infoText = getResources().getString(R.string.text_hello);
-      info.setText(infoText);
-    } else {
-       info.setText("null abar");
-       /* XXX establish some kind of "defective" mode and avoid a crash? */
-    }
+    String infoText = getResources().getString(R.string.text_hello);
+    info.setText(infoText);
 
     PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
   }
@@ -51,13 +49,33 @@ public class HelloAndroid extends Activity {
     return super.onCreateOptionsMenu(menu);
   }
 
+  /*
+   * From the docs:
+   *  Deriving classes should always call through to the base class
+   *  implementation.
+   *  You must return true for the menu to be displayed; if you return false
+   *  it will not be shown.
+   */
+  @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    super.onPrepareOptionsMenu(menu);
+    if (options_menu_inhibit) {
+      addInfo("Pf");
+      return false;
+    }
+    addInfo("Pt");
+    return true;
+  }
+
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     FragmentManager mgr;
 
     switch (item.getItemId()) {
     case R.id.action_settings:
-      abar.setDisplayHomeAsUpEnabled(true);
+      if (abar != null) {
+        abar.setDisplayHomeAsUpEnabled(true);
+      }
 
       mgr = getFragmentManager();
       FragmentTransaction trans = mgr.beginTransaction();
@@ -70,6 +88,8 @@ public class HelloAndroid extends Activity {
       trans.addToBackStack(null);
       trans.commit();
 
+      setMenuInhibit(true);
+
       return true;
 
     case android.R.id.home:
@@ -81,7 +101,9 @@ public class HelloAndroid extends Activity {
       mgr = getFragmentManager();
       mgr.popBackStack();
 
-      abar.setDisplayHomeAsUpEnabled(false);
+      if (abar != null) {
+        abar.setDisplayHomeAsUpEnabled(false);
+      }
       return true;
 
     default:
@@ -100,4 +122,20 @@ public class HelloAndroid extends Activity {
     return true; // "returns true if this Activity is finished"
   }
   */
+
+  public void addInfo(String msg) {
+    if (info != null) {
+      info.setText(info.getText() + " " + msg);
+    }
+  }
+
+  public void setMenuInhibit(boolean inhibit) {
+    options_menu_inhibit = inhibit;
+    invalidateOptionsMenu();
+    if (inhibit) {
+      addInfo("Mi");
+    } else {
+      addInfo("Me");
+    }
+  }
 }
