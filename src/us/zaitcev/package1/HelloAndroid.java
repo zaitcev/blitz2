@@ -7,11 +7,14 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 // import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -40,6 +43,13 @@ public class HelloAndroid extends Activity {
     info.setText(infoText);
 
     PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+    // final Button go = (Button) findViewById(R.id.button_go);
+    // go.setOnClickListener(new Button.OnClickListener() {
+    //   @Override public void onClick(View arg0) {
+    //     info.setText("Go"); // XXX
+    //   }
+    // });
   }
 
   @Override
@@ -122,6 +132,12 @@ public class HelloAndroid extends Activity {
     return true; // "returns true if this Activity is finished"
   }
   */
+
+  public void onGo(View arg) {
+    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+    String loc = sp.getString("pref_shareLocation", "*");
+    info.setText(loc);
+  }
 
   public void addInfo(String msg) {
     if (info != null) {
