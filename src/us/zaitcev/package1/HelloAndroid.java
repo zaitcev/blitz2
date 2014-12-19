@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -17,6 +18,14 @@ import android.view.View;
 import android.widget.Button;
 // import android.widget.LinearLayout;
 import android.widget.TextView;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+// import java.io.BufferedReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class HelloAndroid extends Activity {
 
@@ -134,9 +143,90 @@ public class HelloAndroid extends Activity {
   */
 
   public void onGo(View arg) {
+    URL url;
+
     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
     String loc = sp.getString("pref_shareLocation", "*");
-    info.setText(loc);
+    // info.setText(loc);
+
+    try {
+      url = new URL(loc);
+    } catch (MalformedURLException e) {
+      // XXX Can't show the location because of passwords.
+      info.setText("bad share location");
+      return;
+    }
+    new DownloadShareTask().execute(url);
+  }
+
+  private class DownloadShareTask extends AsyncTask<URL, Void, String> {
+
+    protected String doInBackground(URL... urls) {
+      URL url = urls[0];
+      URLConnection conn;
+      InputStream is;
+      InputStreamReader isr;
+      String ret = "-";
+
+      try {
+        conn = url.openConnection();
+      } catch (IOException e) {
+        // XXX Can't show the location because of passwords.
+        return "error connecting";
+      }
+      try {
+        is = conn.getInputStream();
+      } catch (IOException e) {
+        // XXX Can't show the location because of passwords.
+        // XXX Are we leaking a socket here? No .disconnect(), what to do?
+        return "get failed";
+      } catch (java.lang.IllegalArgumentException e) {
+        // something like  host = null
+        return "bad connection";
+      } catch (Exception e) {
+        // You wouldn't believe how many undocumented exceptions Android throws.
+        // Could even be android.os.NetworkOnMainThreadException.
+        // e.getMessage() returns null
+        return "get error " + e;
+      }
+      try {
+        // Not bothering with conn.getContentEncoding(), our protocol is UTF-8.
+        try {
+          isr = new InputStreamReader(is, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+          // should never happen
+          return "UTF-8";
+        }
+        // BufferedReader in = BufferedReader(isr);
+        char[] buf = new char[1000];
+        int len;
+        try {
+          len = isr.read(buf, 0, buf.length);
+        } catch (IOException e) {
+          len = -1;
+        }
+        if (len < 0) {
+          ret = "*";
+        } else {
+          ret = new String(buf, 0, len);
+        }
+      } catch (Exception e) {
+        // Android
+        ret = "Error";
+      } finally {
+        // conn.disconnect(); -- only for HttpURLConnection
+        try {
+          is.close();
+        } catch (IOException e) {
+          ; // well, son
+        }
+      }
+      return ret;
+    }
+
+    protected void onPostExecute(String result) {
+      addInfo(result);
+    }
   }
 
   public void addInfo(String msg) {
