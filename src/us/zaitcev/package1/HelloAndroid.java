@@ -27,8 +27,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-// import java.io.FileInputStream;
-// import java.io.FileNotFoundException;
 // import java.io.BufferedInputStream;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -65,93 +63,47 @@ public class HelloAndroid extends Activity {
   private TextView info;
   boolean options_menu_inhibit;
 
+  // https://developer.android.com/training/articles/security-ssl.html
   // XXX private?
   public SSLContext addcert() throws AppErrorException {
+    Certificate ca;
+    SSLContext ctx;
 
-    // https://developer.android.com/training/articles/security-ssl.html
-
-    // Load CAs from an InputStream
-    // (could be from a resource or ByteArrayInputStream or ...)
-    CertificateFactory cf;
     try {
-      cf = CertificateFactory.getInstance("X.509");
+      // Load CAs from an InputStream
+      CertificateFactory cf = CertificateFactory.getInstance("X.509");
+      InputStream caInput = getResources().openRawResource(R.raw.cacert);
+      try {
+          ca = cf.generateCertificate(caInput);
+      } finally {
+        try { caInput.close(); } catch (IOException e) { ; /* well, son */ }
+      }
     } catch (CertificateException e) {
       throw new AppErrorException(e.toString());
     }
 
-    // FileInputStream fs;
-    // try {
-    //   fs = new FileInputStream("cacert.pem");
-    // } catch (FileNotFoundException e) {
-    //   throw new AppErrorException(e.toString());
-    // }
-    // InputStream caInput = new BufferedInputStream(fs);
-    InputStream caInput;
     try {
-      caInput = getResources().openRawResource(R.raw.cacert);
-    } catch (NotFoundException e) {
+      // Create a KeyStore containing our trusted CAs
+      // The only way to initialize a KeyStore is to load it. So we load null.
+      KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+      ks.load(null, null);
+      ks.setCertificateEntry("ca", ca);
+
+      // Create a TrustManager that trusts the CAs in our KeyStore
+      String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+      TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+      tmf.init(ks);
+
+      // Create an SSLContext that uses our TrustManager
+      ctx = SSLContext.getInstance("TLS");
+      ctx.init(null, tmf.getTrustManagers(), null);
+
+    } catch (KeyManagementException|KeyStoreException|
+             IOException|NoSuchAlgorithmException|CertificateException e) {
       throw new AppErrorException(e.toString());
     }
 
-    Certificate ca;
-    try {
-      try {
-        ca = cf.generateCertificate(caInput);
-      } catch (CertificateException e) {
-        throw new AppErrorException(e.toString());
-      }
-    } finally {
-      try { caInput.close(); } catch (IOException e) { ; /* well, son */ }
-    }
-
-    // Create a KeyStore containing our trusted CAs
-    // The only way to initialize a KeyStore is to load it. So we load nothing.
-    String keyStoreType = KeyStore.getDefaultType();
-    KeyStore keyStore;
-    try {
-      keyStore = KeyStore.getInstance(keyStoreType);
-    } catch (KeyStoreException e) {
-      throw new AppErrorException(e.toString());
-    }
-    try {
-      keyStore.load(null, null);
-    } catch (IOException|NoSuchAlgorithmException|CertificateException e) {
-      throw new AppErrorException(e.toString());
-    }
-    try {
-      keyStore.setCertificateEntry("ca", ca);
-    } catch (KeyStoreException e) {
-      throw new AppErrorException(e.toString());
-    }
-
-    // Create a TrustManager that trusts the CAs in our KeyStore
-    String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-    TrustManagerFactory tmf;
-    try {
-      tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
-    } catch (NoSuchAlgorithmException e) {
-      throw new AppErrorException(e.toString());
-    }
-    try {
-      tmf.init(keyStore);
-    } catch (KeyStoreException e) {
-      throw new AppErrorException(e.toString());
-    }
-
-    // Create an SSLContext that uses our TrustManager
-    SSLContext context;
-    try {
-      context = SSLContext.getInstance("TLS");
-    } catch (NoSuchAlgorithmException e) {
-      throw new AppErrorException(e.toString());
-    }
-    try {
-      context.init(null, tmf.getTrustManagers(), null);
-    } catch (KeyManagementException e) {
-      throw new AppErrorException(e.toString());
-    }
-
-    return context;
+    return ctx;
   }
 
   @Override
