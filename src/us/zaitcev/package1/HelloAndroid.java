@@ -27,12 +27,132 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+// import java.io.FileInputStream;
+// import java.io.FileNotFoundException;
+// import java.io.BufferedInputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateException;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.HttpsURLConnection;
+import android.content.res.Resources.NotFoundException;
+import android.util.Base64;
+
+class AppErrorException extends Exception {
+  // We don't know why Exception is Serializable in Android but not normal Java.
+  private static final long serialVersionUID = 1L;
+  // For some reason, Exception does not have a constructor(String).
+  // So, we include our own trivial version. Yeah, Java is odd.
+  private String message;
+  AppErrorException(String msg) {
+    message = msg;
+  }
+  public String toString() {
+    return message;
+  }
+}
+
 public class HelloAndroid extends Activity {
 
   // private LinearLayout root;
   private ActionBar abar;
   private TextView info;
   boolean options_menu_inhibit;
+
+  // XXX private?
+  public SSLContext addcert() throws AppErrorException {
+
+    // https://developer.android.com/training/articles/security-ssl.html
+
+    // Load CAs from an InputStream
+    // (could be from a resource or ByteArrayInputStream or ...)
+    CertificateFactory cf;
+    try {
+      cf = CertificateFactory.getInstance("X.509");
+    } catch (CertificateException e) {
+      throw new AppErrorException(e.toString());
+    }
+
+    // FileInputStream fs;
+    // try {
+    //   fs = new FileInputStream("cacert.pem");
+    // } catch (FileNotFoundException e) {
+    //   throw new AppErrorException(e.toString());
+    // }
+    // InputStream caInput = new BufferedInputStream(fs);
+    InputStream caInput;
+    try {
+      caInput = getResources().openRawResource(R.raw.cacert);
+    } catch (NotFoundException e) {
+      throw new AppErrorException(e.toString());
+    }
+
+    Certificate ca;
+    try {
+      try {
+        ca = cf.generateCertificate(caInput);
+      } catch (CertificateException e) {
+        throw new AppErrorException(e.toString());
+      }
+    } finally {
+      try { caInput.close(); } catch (IOException e) { ; /* well, son */ }
+    }
+
+    // Create a KeyStore containing our trusted CAs
+    // The only way to initialize a KeyStore is to load it. So we load nothing.
+    String keyStoreType = KeyStore.getDefaultType();
+    KeyStore keyStore;
+    try {
+      keyStore = KeyStore.getInstance(keyStoreType);
+    } catch (KeyStoreException e) {
+      throw new AppErrorException(e.toString());
+    }
+    try {
+      keyStore.load(null, null);
+    } catch (IOException|NoSuchAlgorithmException|CertificateException e) {
+      throw new AppErrorException(e.toString());
+    }
+    try {
+      keyStore.setCertificateEntry("ca", ca);
+    } catch (KeyStoreException e) {
+      throw new AppErrorException(e.toString());
+    }
+
+    // Create a TrustManager that trusts the CAs in our KeyStore
+    String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+    TrustManagerFactory tmf;
+    try {
+      tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+    } catch (NoSuchAlgorithmException e) {
+      throw new AppErrorException(e.toString());
+    }
+    try {
+      tmf.init(keyStore);
+    } catch (KeyStoreException e) {
+      throw new AppErrorException(e.toString());
+    }
+
+    // Create an SSLContext that uses our TrustManager
+    SSLContext context;
+    try {
+      context = SSLContext.getInstance("TLS");
+    } catch (NoSuchAlgorithmException e) {
+      throw new AppErrorException(e.toString());
+    }
+    try {
+      context.init(null, tmf.getTrustManagers(), null);
+    } catch (KeyManagementException e) {
+      throw new AppErrorException(e.toString());
+    }
+
+    return context;
+  }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -174,19 +294,54 @@ public class HelloAndroid extends Activity {
         // XXX Can't show the location because of passwords.
         return "error connecting";
       }
+
+      if (conn instanceof HttpsURLConnection) {
+        // XXX compare hostnames and only do this for certain domains.
+
+        SSLContext ctx;
+        try {
+          ctx = addcert();
+        } catch (AppErrorException e) {
+          return "addcert error " + e;
+        }
+
+        HttpsURLConnection sslconn = (HttpsURLConnection) conn;
+        sslconn.setSSLSocketFactory(ctx.getSocketFactory());
+      }
+
+      // Authenticator.setDefault(new Authenticator() {
+      //   protected PasswordAuthentication getPasswordAuthentication() {
+      //     return new PasswordAuthentication("username",
+      //                                       "password".toCharArray());
+      //   }
+      // });
+
+      // HttpURLConnection will not use the username and password in the URL
+      // unless we force the issue.
+      if (url.getUserInfo() != null) {
+        // String authString = username + ":" + password;
+        byte[] b = Base64.encode(url.getUserInfo().getBytes(), Base64.NO_WRAP);
+        String basicAuth = "Basic " + new String(b);
+        conn.addRequestProperty("Authorization", basicAuth);
+      }
+
       try {
         is = conn.getInputStream();
+      } catch (javax.net.ssl.SSLHandshakeException e) {
+        // This is a subclass of IOException, but we're interested int his
+        // specifically because it happens when CA is unknown.
+        return "SSL handshake failed " + e;
       } catch (IOException e) {
         // XXX Can't show the location because of passwords.
         // XXX Are we leaking a socket here? No .disconnect(), what to do?
-        return "get failed";
+        return "get failed " + e;
       } catch (java.lang.IllegalArgumentException e) {
         // something like  host = null
         return "bad connection";
       } catch (Exception e) {
         // You wouldn't believe how many undocumented exceptions Android throws.
         // Could even be android.os.NetworkOnMainThreadException.
-        // e.getMessage() returns null
+        // e.getMessage() returns null, only e.toString() works
         return "get error " + e;
       }
       try {
@@ -215,11 +370,7 @@ public class HelloAndroid extends Activity {
         ret = "Error";
       } finally {
         // conn.disconnect(); -- only for HttpURLConnection
-        try {
-          is.close();
-        } catch (IOException e) {
-          ; // well, son
-        }
+        try { is.close(); } catch (IOException e) { ; /* well, son */ }
       }
       return ret;
     }

@@ -16,7 +16,7 @@ ANDROID_JAR := ${ANDROID_HOME}/platforms/android-${minSdkVersion}/android.jar
 
 DEV_HOME := $(shell pwd)
 
-resources = res/drawable/blitz2_1.png res/layout/main.xml res/menu/actions.xml res/values/arrays.xml res/values/strings.xml res/xml/preferences.xml
+resources = res/drawable/blitz2_1.png res/layout/main.xml res/menu/actions.xml res/raw/cacert.dat res/values/arrays.xml res/values/strings.xml res/xml/preferences.xml
 
 all: bin/blitz2_1.apk
 
