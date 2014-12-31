@@ -19,7 +19,7 @@ public class SettingsFragment
     addPreferencesFromResource(R.xml.preferences);
     // abar.setDisplayHomeAsUpEnabled(true);
 
-    HelloAndroid my_activity = (HelloAndroid) getActivity();
+    // HelloAndroid my_activity = (HelloAndroid) getActivity();
 
     /*
      * It's quite odd that inflation is asynchronous elsewhere, but we
@@ -30,13 +30,13 @@ public class SettingsFragment
     if (p != null) {
       String type = p.getEntry().toString();
       if (type != null) {
-        my_activity.addInfo("Scx");
+        // my_activity.addInfo("Scx");
         p.setSummary(type);
       } else {
-        my_activity.addInfo("Sct");
+        // my_activity.addInfo("Sct");
       }
     } else {
-      my_activity.addInfo("Scn");
+      // my_activity.addInfo("Scn");
     }
 
     // XXX sadly this does not work
@@ -60,7 +60,7 @@ public class SettingsFragment
   @Override
   public void onDestroy () {
     HelloAndroid my_activity = (HelloAndroid) getActivity();
-    my_activity.addInfo("Sd");
+    // my_activity.addInfo("Sd");
 
     /* Maybe call setDisplayHomeAsUpEnabled(false) in this method too? */
     my_activity.setMenuInhibit(false);
@@ -88,22 +88,22 @@ public class SettingsFragment
    */
 
   public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
-    HelloAndroid my_activity = (HelloAndroid) getActivity();
+    // HelloAndroid my_activity = (HelloAndroid) getActivity();
 
     if (key.equals(KEY_PREF_SHARE_TYPE)) {
       // Preference connectionPref = findPreference(key);
       // connectionPref.setSummary(sp.getString(key, ""));
       ListPreference p = (ListPreference) findPreference(KEY_PREF_SHARE_TYPE);
       if (p == null) {
-        my_activity.addInfo("St1");
+        // my_activity.addInfo("St1");
         return;
       }
       String type = p.getEntry().toString();
       if (type == null) {
-        my_activity.addInfo("St2");
+        // my_activity.addInfo("St2");
         return;
       }
-      my_activity.addInfo("St");
+      // my_activity.addInfo("St");
       p.setSummary(type);
     }
   }

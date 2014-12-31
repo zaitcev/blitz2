@@ -154,10 +154,10 @@ public class HelloAndroid extends Activity {
   public boolean onPrepareOptionsMenu(Menu menu) {
     super.onPrepareOptionsMenu(menu);
     if (options_menu_inhibit) {
-      addInfo("Pf");
+      // addInfo("Pf");
       return false;
     }
-    addInfo("Pt");
+    // addInfo("Pt");
     return true;
   }
 
@@ -340,9 +340,9 @@ public class HelloAndroid extends Activity {
 
     protected void onPostExecute(DownloadResult result) {
       if (result.error != null) {
-        addInfo("ERROR: " + result.error);
+        setInfo("ERROR: " + result.error);
       } else {
-        addInfo("Clip: " + result.data);
+        setInfo("Clip: " + result.data);
         setClipboard(result.data);
       }
     }
@@ -355,19 +355,25 @@ public class HelloAndroid extends Activity {
     clipboard.setPrimaryClip(clip);
   }
 
-  public void addInfo(String msg) {
+  // public void addInfo(String msg) {
+  //   if (info != null) {
+  //     info.setText(info.getText() + " " + msg);
+  //   }
+  // }
+
+  public void setInfo(String msg) {
     if (info != null) {
-      info.setText(info.getText() + " " + msg);
+      info.setText(msg);
     }
   }
 
   public void setMenuInhibit(boolean inhibit) {
     options_menu_inhibit = inhibit;
     invalidateOptionsMenu();
-    if (inhibit) {
-      addInfo("Mi");
-    } else {
-      addInfo("Me");
-    }
+    // if (inhibit) {
+    //   addInfo("Mi");
+    // } else {
+    //   addInfo("Me");
+    // }
   }
 }
