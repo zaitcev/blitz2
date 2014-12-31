@@ -7,6 +7,9 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -231,9 +234,18 @@ public class HelloAndroid extends Activity {
     new DownloadShareTask().execute(url);
   }
 
-  private class DownloadShareTask extends AsyncTask<URL, Void, String> {
+  private class DownloadResult {
+    public String error;
+    public String data;
+    DownloadResult(String error_, String data_) {
+      error = error_;
+      data = data_;
+    }
+  }
 
-    protected String doInBackground(URL... urls) {
+  private class DownloadShareTask extends AsyncTask<URL, Void, DownloadResult> {
+
+    protected DownloadResult doInBackground(URL... urls) {
       URL url = urls[0];
       URLConnection conn;
       InputStream is;
@@ -244,7 +256,7 @@ public class HelloAndroid extends Activity {
         conn = url.openConnection();
       } catch (IOException e) {
         // XXX Can't show the location because of passwords.
-        return "error connecting";
+        return new DownloadResult("error connecting", null);
       }
 
       if (conn instanceof HttpsURLConnection) {
@@ -254,7 +266,7 @@ public class HelloAndroid extends Activity {
         try {
           ctx = addcert();
         } catch (AppErrorException e) {
-          return "addcert error " + e;
+          return new DownloadResult("addcert error, " + e, null);
         }
 
         HttpsURLConnection sslconn = (HttpsURLConnection) conn;
@@ -282,27 +294,25 @@ public class HelloAndroid extends Activity {
       } catch (javax.net.ssl.SSLHandshakeException e) {
         // This is a subclass of IOException, but we're interested int his
         // specifically because it happens when CA is unknown.
-        return "SSL handshake failed " + e;
+        return new DownloadResult("SSL handshake failed, " + e, null);
       } catch (IOException e) {
         // XXX Can't show the location because of passwords.
-        // XXX Are we leaking a socket here? No .disconnect(), what to do?
-        return "get failed " + e;
+        return new DownloadResult("get failed", null);
       } catch (java.lang.IllegalArgumentException e) {
         // something like  host = null
-        return "bad connection";
+        return new DownloadResult("bad connection", null);
       } catch (Exception e) {
         // You wouldn't believe how many undocumented exceptions Android throws.
         // Could even be android.os.NetworkOnMainThreadException.
         // e.getMessage() returns null, only e.toString() works
-        return "get error " + e;
+        return new DownloadResult("get, " + e, null);
       }
       try {
         // Not bothering with conn.getContentEncoding(), our protocol is UTF-8.
         try {
           isr = new InputStreamReader(is, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-          // should never happen
-          return "UTF-8";
+          return new DownloadResult("UTF-8", null);
         }
         // BufferedReader in = BufferedReader(isr);
         char[] buf = new char[1000];
@@ -318,18 +328,31 @@ public class HelloAndroid extends Activity {
           ret = new String(buf, 0, len);
         }
       } catch (Exception e) {
-        // Android
-        ret = "Error";
+        // Android throws exceptions that we do not even realize.
+        // At least report them.
+        return new DownloadResult("download, " + e, null);
       } finally {
         // conn.disconnect(); -- only for HttpURLConnection
         try { is.close(); } catch (IOException e) { ; /* well, son */ }
       }
-      return ret;
+      return new DownloadResult(null, ret);
     }
 
-    protected void onPostExecute(String result) {
-      addInfo(result);
+    protected void onPostExecute(DownloadResult result) {
+      if (result.error != null) {
+        addInfo("ERROR: " + result.error);
+      } else {
+        addInfo("Clip: " + result.data);
+        setClipboard(result.data);
+      }
     }
+  }
+
+  public void setClipboard(String text) {
+    ClipboardManager clipboard = (ClipboardManager)
+        getSystemService(Context.CLIPBOARD_SERVICE);
+    ClipData clip = ClipData.newPlainText("blitz2", text);
+    clipboard.setPrimaryClip(clip);
   }
 
   public void addInfo(String msg) {
